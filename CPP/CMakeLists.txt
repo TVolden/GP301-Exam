@@ -23,7 +23,7 @@ set(EXTERNAL_LIBRARIES_SOURCE_PATH ${CMAKE_SOURCE_DIR}/common/third-party)
 # ---------------------------------------------------------------------------------
 # Cmake projects
 # ---------------------------------------------------------------------------------
-project(ITU-graphics-programming-exam)
+project(ITU-graphics-exam)
 
 set(FBX_SUPPORT OFF)
 
