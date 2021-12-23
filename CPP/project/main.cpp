@@ -37,12 +37,7 @@ const unsigned int SCR_HEIGHT = 720;
 // global variables used for rendering
 // -----------------------------------
 Shader* shader;
-Model* carPaint;
-Model* carBody;
-Model* carInterior;
-Model* carLight;
-Model* carWindow;
-Model* carWheel;
+Model* playerModel;
 Model* floorModel;
 
 Shader* skyboxShader;
@@ -95,7 +90,7 @@ int main()
 
     // glfw window creation
     // --------------------
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Exercise 11", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Thomas Volden - Tessellation", NULL, NULL);
     if (window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -121,12 +116,7 @@ int main()
 
     // init shaders and models
 	shader = new Shader("shaders/shader.vert", "shaders/shader.frag");
-	carPaint = new Model("car/Paint_LOD0.obj");
-	carBody = new Model("car/Body_LOD0.obj");
-	carLight = new Model("car/Light_LOD0.obj");
-	carInterior = new Model("car/Interior_LOD0.obj");
-	carWindow = new Model("car/Windows_LOD0.obj");
-	carWheel = new Model("car/Wheel_LOD0.obj");
+	playerModel = new Model("quake/player.obj");
 	floorModel = new Model("floor/floor.obj");
     skyboxShader = new Shader("shaders/skybox.vert", "shaders/skybox.frag");
 
@@ -195,12 +185,7 @@ int main()
 
 	//delete carModel;
 	delete floorModel;
-	delete carWindow;
-	delete carPaint;
-	delete carInterior;
-	delete carLight;
-	delete carBody;
-    delete carWheel;
+	delete playerModel;
     delete shader;
     delete skyboxShader;
 
@@ -408,46 +393,18 @@ void drawScene(){
     floorModel->Draw(*shader);
 
     // this transform is applied to the whole car, you can use it to move the car
-    glm::mat4 carTransform = glm::mat4(1.0f);
-
-    // draw wheel
-    model = glm::translate(carTransform, glm::vec3(-.7432, .328, 1.39));
-    shader->setMat4("model", model);
-    shader->setMat3("modelInvTra", glm::inverse(glm::transpose(model)));
-    carWheel->Draw(*shader);
-
-    // draw wheel
-    model = glm::translate(carTransform, glm::vec3(-.7432, .328, -1.296));
-    shader->setMat4("model", model);
-    shader->setMat3("modelInvTra", glm::inverse(glm::transpose(model)));
-    carWheel->Draw(*shader);
-
-    // draw wheel
-    model = glm::rotate(carTransform, glm::pi<float>(), glm::vec3(0.0, 1.0, 0.0));
-    model = glm::translate(model, glm::vec3(-.7432, .328, 1.296));
-    shader->setMat4("model", model);
-    shader->setMat3("modelInvTra", glm::inverse(glm::transpose(model)));
-    carWheel->Draw(*shader);
-
-    // draw wheel
-    model = glm::rotate(carTransform, glm::pi<float>(), glm::vec3(0.0, 1.0, 0.0));
-    model = glm::translate(model, glm::vec3(-.7432, .328, -1.39));
-    shader->setMat4("model", model);
-    shader->setMat3("modelInvTra", glm::inverse(glm::transpose(model)));
-    carWheel->Draw(*shader);
+    glm::mat4 playerTransform = glm::mat4(1.0f);
+    playerTransform = glm::translate(playerTransform, glm::vec3(0, 0.5, 0));
+    playerTransform = glm::scale(playerTransform, glm::vec3(0.25, 0.25, 0.25));
 
     // draw the rest of the car
-    model = carTransform;
+    model = playerTransform;
     shader->setMat4("model", model);
     shader->setMat3("modelInvTra", glm::inverse(glm::transpose(model)));
-    carBody->Draw(*shader);
-    carInterior->Draw(*shader);
-    carPaint->Draw(*shader);
-    carLight->Draw(*shader);
+    playerModel->Draw(*shader);
     // draw transparent objects at the end
-    glEnable(GL_BLEND); glDisable(GL_CULL_FACE);
-    carWindow->Draw(*shader);
-    glDisable(GL_BLEND); glEnable(GL_CULL_FACE);
+    //glEnable(GL_BLEND); glDisable(GL_CULL_FACE);
+    //glDisable(GL_BLEND); glEnable(GL_CULL_FACE);
 
 }
 
