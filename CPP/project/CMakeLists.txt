@@ -17,7 +17,7 @@ endif()
 
 ## set target project
 file(GLOB target_src "*.h" "*.cpp") # look for source files
-file(GLOB target_shaders "shaders/*.vert" "shaders/*.frag") # look for shaders
+file(GLOB target_shaders "shaders/*.vert" "shaders/*.frag" "shaders/*.tesc" "shaders/*.tese") # look for shaders
 add_executable(THVO-Project ${target_src} ${target_shaders})
 
 ## set link libraries

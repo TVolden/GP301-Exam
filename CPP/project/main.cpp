@@ -37,6 +37,7 @@ const unsigned int SCR_HEIGHT = 720;
 // global variables used for rendering
 // -----------------------------------
 Shader* shader;
+Shader* playerShader;
 Model* playerModel;
 Model* floorModel;
 
@@ -116,6 +117,7 @@ int main()
 
     // init shaders and models
 	shader = new Shader("shaders/shader.vert", "shaders/shader.frag");
+    playerShader = new Shader("shaders/shader.vert", "shaders/shader.frag", "shaders/shader.tesc", "shaders/shader.tese");
 	playerModel = new Model("quake/player.obj");
 	floorModel = new Model("floor/floor.obj");
     skyboxShader = new Shader("shaders/skybox.vert", "shaders/skybox.frag");
@@ -139,7 +141,6 @@ int main()
     glDepthFunc(GL_LESS); // draws fragments that are closer to the screen in NDC
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_CULL_FACE);
-
 
     // IMGUI init
     IMGUI_CHECKVERSION();
