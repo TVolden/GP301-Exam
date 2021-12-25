@@ -13,6 +13,8 @@ class Shader
 {
 public:
     unsigned int ID;
+    GLenum DrawMode = GL_TRIANGLES;
+
     // constructor generates the shader on the fly
     // ------------------------------------------------------------------------
     Shader(const char* vertexPath, const char* fragmentPath, const char* tesControlPath = nullptr, const char* tesEvalPath = nullptr)
@@ -67,7 +69,7 @@ public:
         {
             std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
         }
-        const char* vShaderCode = vertexCode.c_str();
+        const char * vShaderCode = vertexCode.c_str();
         const char * fShaderCode = fragmentCode.c_str();
         // 2. compile shaders
         unsigned int vertex, fragment;
@@ -96,8 +98,8 @@ public:
         unsigned int tesEval;
         if (tesEvalPath != nullptr)
         {
-            const char* gShaderCode = testEvalCode.c_str();
-            tesEval = glCreateShader(GL_TESS_CONTROL_SHADER);
+            const char * gShaderCode = testEvalCode.c_str();
+            tesEval = glCreateShader(GL_TESS_EVALUATION_SHADER);
             glShaderSource(tesEval, 1, &gShaderCode, NULL);
             glCompileShader(tesEval);
             checkCompileErrors(tesEval, "TESSELLATION EVALUATION");

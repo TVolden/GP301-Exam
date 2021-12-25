@@ -114,10 +114,10 @@ int main()
         return -1;
     }
 
-
     // init shaders and models
 	shader = new Shader("shaders/shader.vert", "shaders/shader.frag");
-    playerShader = new Shader("shaders/shader.vert", "shaders/shader.frag", "shaders/shader.tesc", "shaders/shader.tese");
+    playerShader = new Shader("shaders/soften.vert", "shaders/soften.frag", "shaders/soften.tesc", "shaders/soften.tese");
+    playerShader->DrawMode = GL_PATCHES;
 	playerModel = new Model("quake/player.obj");
 	floorModel = new Model("floor/floor.obj");
     skyboxShader = new Shader("shaders/skybox.vert", "shaders/skybox.frag");
@@ -141,6 +141,12 @@ int main()
     glDepthFunc(GL_LESS); // draws fragments that are closer to the screen in NDC
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_CULL_FACE);
+
+    // Tessellation settings
+    GLint MaxPatchVertices = 0;
+    glGetIntegerv(GL_MAX_PATCH_VERTICES, &MaxPatchVertices);
+    printf("Max supported patch vertices %d\n", MaxPatchVertices);
+    glPatchParameteri(GL_PATCH_VERTICES, 3);
 
     // IMGUI init
     IMGUI_CHECKVERSION();
@@ -360,7 +366,7 @@ void drawScene(){
     glBindVertexArray(0);
     glDepthFunc(GL_LESS); // set depth function back to default
 
-    // render floor and car with the same shader
+    // render floor
     shader->use();
 
     // light uniforms
@@ -393,16 +399,40 @@ void drawScene(){
     shader->setMat3("modelInvTra", glm::inverse(glm::transpose(model)));
     floorModel->Draw(*shader);
 
-    // this transform is applied to the whole car, you can use it to move the car
+    // render player
+    playerShader->use();
+
+    // light uniforms
+    playerShader->setVec3("ambientLightColor", config.ambientLightColor * config.ambientLightIntensity);
+    playerShader->setVec3("lightDirection", config.lightDirection);
+    playerShader->setVec3("lightColor", config.lightColor * config.lightIntensity);
+
+    // material uniforms
+    playerShader->setFloat("ambientOcclusionMix", config.ambientOcclusionMix);
+    playerShader->setFloat("normalMappingMix", config.normalMappingMix);
+    playerShader->setFloat("reflectionMix", config.reflectionMix);
+    playerShader->setFloat("specularExponent", config.specularExponent);
+
+    // set projection matrix uniform
+    playerShader->setMat4("projection", projection);
+    playerShader->setVec3("viewPosition", camera.Position);
+    playerShader->setMat4("view", view);
+
+    // set up skybox texture
+    playerShader->setInt("skybox", 4);
+    glActiveTexture(GL_TEXTURE4);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+
+    // this transform is applied to the player
     glm::mat4 playerTransform = glm::mat4(1.0f);
     playerTransform = glm::translate(playerTransform, glm::vec3(0, 0.5, 0));
     playerTransform = glm::scale(playerTransform, glm::vec3(0.25, 0.25, 0.25));
 
-    // draw the rest of the car
+    // draw player
     model = playerTransform;
-    shader->setMat4("model", model);
-    shader->setMat3("modelInvTra", glm::inverse(glm::transpose(model)));
-    playerModel->Draw(*shader);
+    playerShader->setMat4("model", model);
+    playerShader->setMat3("modelInvTra", glm::inverse(glm::transpose(model)));
+    playerModel->Draw(*playerShader);
     // draw transparent objects at the end
     //glEnable(GL_BLEND); glDisable(GL_CULL_FACE);
     //glDisable(GL_BLEND); glEnable(GL_CULL_FACE);
