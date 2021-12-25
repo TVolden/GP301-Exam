@@ -13,7 +13,7 @@ out VS_OUT {
    vec3 Norm_tangent;
    vec2 textCoord;
    mat3 invTBN;
-} vs_out;
+} fs_in;
 
 // transformations
 uniform mat4 projection;   // camera projection matrix
@@ -28,7 +28,7 @@ uniform vec3 viewPosition;
 
 void main() {
    // send text coord to fragment shader
-   vs_out.textCoord = textCoord;
+   fs_in.textCoord = textCoord;
 
    // vertex normal in world space
    vec3 N = normalize(modelInvTra * normal);
@@ -44,12 +44,12 @@ void main() {
 
    // variables we wanna send to the fragment shader
    // inverse of TBN, to map from tangent space to world space (needed for reflections)
-   vs_out.invTBN = transpose(TBN);
+   fs_in.invTBN = transpose(TBN);
    // light direction, view position, vertex position, and normal in tangent space
-   vs_out.LightDir_tangent = TBN * lightDirection;
-   vs_out.CamPos_tangent = TBN * viewPosition;
-   vs_out.Pos_tangent  = TBN * vec3(model * vec4(vertex, 1.0)); // NEW, there was a mistake in the original code, we use the vertex position so it gets interpolated during rasterization
-   vs_out.Norm_tangent = TBN * N;
+   fs_in.LightDir_tangent = TBN * lightDirection;
+   fs_in.CamPos_tangent = TBN * viewPosition;
+   fs_in.Pos_tangent  = TBN * vec3(model * vec4(vertex, 1.0)); // NEW, there was a mistake in the original code, we use the vertex position so it gets interpolated during rasterization
+   fs_in.Norm_tangent = TBN * N;
 
    // final vertex transform (for opengl rendering)
    gl_Position = projection * view * model * vec4(vertex, 1.0);

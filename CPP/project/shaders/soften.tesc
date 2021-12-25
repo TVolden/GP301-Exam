@@ -6,16 +6,21 @@ layout (vertices = 3) out;
 uniform vec3 viewPosition;
 
 // attributes of the input CPs
-struct VS_OUT {
+in VS_OUT {
    vec3 WorldPos;
    vec3 Normal;
    vec2 TexCoord;
    vec3 Tangent;
    vec3 Bitangent;
-};
+} cs_in[];
 
-in VS_OUT cs_in[];
-out VS_OUT cs_out[];
+out CS_OUT {
+    vec3 WorldPos;
+    vec3 Normal;
+    vec2 TexCoord;
+    vec3 Tangent;
+    vec3 Bitangent;
+} cs_out[];
 
 float GetTessLevel(float Distance0, float Distance1)
 {
@@ -35,7 +40,11 @@ float GetTessLevel(float Distance0, float Distance1)
 void main()
 {
     // Pass through the output from vertex shader
-    cs_out[gl_InvocationID] = cs_in[gl_InvocationID];
+    cs_out[gl_InvocationID].WorldPos = cs_in[gl_InvocationID].WorldPos;
+    cs_out[gl_InvocationID].Normal = cs_in[gl_InvocationID].Normal;
+    cs_out[gl_InvocationID].TexCoord = cs_in[gl_InvocationID].TexCoord;
+    cs_out[gl_InvocationID].Tangent = cs_in[gl_InvocationID].Tangent;
+    cs_out[gl_InvocationID].Bitangent = cs_in[gl_InvocationID].Bitangent;
 
     // Calculate the distance from the camera to the three control points
     float EyeToVertexDistance0 = distance(viewPosition, cs_in[0].WorldPos);

@@ -12,7 +12,7 @@ out VS_OUT {
    vec2 TexCoord;
    vec3 Tangent;
    vec3 Bitangent;
-} vs_out;
+} cs_in;
 
 // transformations
 uniform mat4 projection;   // camera projection matrix
@@ -23,15 +23,15 @@ uniform mat3 modelInvTra;  // inverse of the transpose of the model matrix, used
 
 void main() {
    // send texture coord to fragment shader
-   vs_out.TexCoord = texCoord;
+   cs_in.TexCoord = texCoord;
 
    // send tangent to tessellation evaluation shader
-   vs_out.Tangent = tangent;
-   vs_out.Bitangent = bitangent;
+   cs_in.Tangent = tangent;
+   cs_in.Bitangent = bitangent;
 
    // vertex normal in world space
-   vs_out.Normal = normalize(modelInvTra * normal);
+   cs_in.Normal = normalize(modelInvTra * normal);
 
    // vertex position in world space
-   vs_out.WorldPos = (model * vec4(vertex, 1.0)).xyz;
+   cs_in.WorldPos = (model * vec4(vertex, 1.0)).xyz;
 }

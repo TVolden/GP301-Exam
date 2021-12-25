@@ -47,8 +47,7 @@ void main()
    // TODO exercise 10.4 normal texture sampling and range adjustment
    // fix normal range: rgb sampled value is in the range [0,1], but xyz normal vectors must be in the range [-1,1]
    vec3 N = texture(texture_normal1, fs_in.textCoord).xyz;
-   N = N * 2f - 1f;
-
+   N = N * 2.0f - 1.0f;
 
    // mix the vertex normal and the normal map texture so we can visualize the difference with it makes with a slider
    N = normalize(mix(fs_in.Norm_tangent, N, normalMappingMix));
@@ -60,8 +59,6 @@ void main()
    vec3 tangentIncident = (fs_in.Pos_tangent - fs_in.CamPos_tangent);
    vec3 tangentReflect = reflect(tangentIncident, N);
    vec3 reflectionColor = texture(skybox, fs_in.invTBN * tangentReflect).rgb;
-
-
 
    // LIGHTING - there are two differences in this lighting model:
    // blinn-phong reflection model instead of phong

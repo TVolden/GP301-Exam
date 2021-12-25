@@ -5,13 +5,13 @@ layout(triangles, equal_spacing, ccw) in;
 //uniform sampler2D gDisplacementMap;
 //uniform float gDispFactor;
 
-in VS_OUT {
+in CS_OUT {
    vec3 WorldPos;
    vec3 Normal;
    vec2 TexCoord;
    vec3 Tangent;
    vec3 Bitangent;
-} es_in[];
+} cs_out[];
 
 out ES_OUT {
    vec3 CamPos_tangent;
@@ -45,14 +45,14 @@ vec3 interpolate3D(vec3 v0, vec3 v1, vec3 v2)
 void main()
 {
     // Interpolate the attributes of the output vertex using the barycentric coordinates
-    es_out.TexCoord = interpolate2D(es_in[0].TexCoord, es_in[1].TexCoord, es_in[2].TexCoord);
+    es_out.TexCoord = interpolate2D(cs_out[0].TexCoord, cs_out[1].TexCoord, cs_out[2].TexCoord);
 
     // Normal in world space
-    vec3 N = interpolate3D(es_in[0].Normal, es_in[1].Normal, es_in[2].Normal);
+    vec3 N = interpolate3D(cs_out[0].Normal, cs_out[1].Normal, cs_out[2].Normal);
     N = normalize(N);
 
     // Interpolate the tangent
-    vec3 tangen = interpolate3D(es_in[0].Tangent, es_in[1].Tangent, es_in[2].Tangent);
+    vec3 tangen = interpolate3D(cs_out[0].Tangent, cs_out[1].Tangent, cs_out[2].Tangent);
 
     vec3 T = normalize(modelInvTra * tangen);
     T = normalize(T - dot(T, N) * N);
@@ -62,11 +62,11 @@ void main()
     // inverse of TBN, to map from tangent space to world space (needed for reflections)
     es_out.InverseTBN = transpose(TBN);
 
-    vec3 position = interpolate3D(es_in[0].WorldPos, es_in[1].WorldPos, es_in[2].WorldPos);
+    vec3 position = interpolate3D(cs_out[0].WorldPos, cs_out[1].WorldPos, cs_out[2].WorldPos);
     
     // Displace the vertex along the normal
-    //float Displacement = texture(gDisplacementMap, es_out.TexCoord.xy).x;
-    //position += N * Displacement * gDispFactor;
+//    float Displacement = texture(gDisplacementMap, es_out.TexCoord.xy).x;
+//    position += N * Displacement * gDispFactor;
 
     // light direction, view position, vertex position, and normal in tangent space
     es_out.LightDir_tangent = TBN * lightDirection;
