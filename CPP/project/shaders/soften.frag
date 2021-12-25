@@ -27,9 +27,6 @@ uniform sampler2D texture_ambient1;
 // skybox cubemap
 uniform samplerCube skybox;
 
-// camera position
-uniform vec3 viewPosition;
-
 // output color
 out vec4 FragColor;
 
@@ -42,7 +39,6 @@ void main()
    float ambientOcclusion = texture(texture_ambient1, es_out.TexCoord).r;
    ambientOcclusion = mix(1.0, ambientOcclusion, ambientOcclusionMix);
 
-   // TODO exercise 10.4 normal texture sampling and range adjustment
    // fix normal range: rgb sampled value is in the range [0,1], but xyz normal vectors must be in the range [-1,1]
    vec3 N = texture(texture_normal1, es_out.TexCoord).xyz;
    N = N * 2.0f - 1.0f;
@@ -50,9 +46,6 @@ void main()
    // mix the vertex normal and the normal map texture so we can visualize the difference with it makes with a slider
    N = normalize(mix(es_out.Norm_tangent, N, normalMappingMix));
 
-   // TODO exercise 10.5 skybox reflection
-
-   // TODO exercise 10.5 skybox reflection using the normal map
    //  the cube map has to be sampled with world space directions, rotate the normal with es_out.invTBN so that it's in world space
    vec3 tangentIncident = (es_out.Pos_tangent - es_out.CamPos_tangent);
    vec3 tangentReflect = reflect(tangentIncident, N);

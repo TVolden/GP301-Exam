@@ -159,7 +159,6 @@ int main()
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 330 core");
 
-
     // render loop
     while (!glfwWindowShouldClose(window))
     {
@@ -173,13 +172,11 @@ int main()
         glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
         drawScene();
 
 		if (isPaused) {
 			drawGui();
 		}
-
 
         glfwSwapBuffers(window);
         glfwPollEvents();

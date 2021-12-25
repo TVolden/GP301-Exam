@@ -2,9 +2,6 @@
 
 layout(triangles, equal_spacing, ccw) in;
 
-//uniform sampler2D gDisplacementMap;
-//uniform float gDispFactor;
-
 in CS_OUT {
    vec3 WorldPos;
    vec3 Normal;
