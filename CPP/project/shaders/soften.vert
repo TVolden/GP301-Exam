@@ -31,7 +31,7 @@ void main() {
 
    // vertex normal in world space
    cs_in.Normal = normalize(modelInvTra * normal);
-
+   
    // vertex position in world space
    cs_in.WorldPos = (model * vec4(vertex, 1.0)).xyz;
 }

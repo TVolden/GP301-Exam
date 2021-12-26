@@ -111,24 +111,15 @@ public:
         glAttachShader(ID, vertex);
         glAttachShader(ID, fragment);
 
-        // Tessellation settings
-        GLint MaxPatchVertices = 0;
-        glGetIntegerv(GL_MAX_PATCH_VERTICES, &MaxPatchVertices);
-        printf("Max supported patch vertices %d\n", MaxPatchVertices);
-        glPatchParameteri(GL_PATCH_VERTICES, 3);
-
         if(tesControlPath != nullptr)
         {
             glAttachShader(ID, tesControl);
-            checkCompileErrors(ID, "TESSELLATION CONTROL LINK ERROR");
         }
 
         if (tesEvalPath != nullptr)
         {
             glAttachShader(ID, tesEval);
-            checkCompileErrors(ID, "TESSELLATION EVALUATION LINK ERROR");
         }
-
 
         glLinkProgram(ID);
         checkCompileErrors(ID, "PROGRAM");

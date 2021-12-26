@@ -12,3 +12,4 @@ d 1.000000
 illum 2
 
 map_Kd player.png
+map_Ka heightmap.png

@@ -82,12 +82,12 @@ public:
             // and finally bind the texture
             glBindTexture(GL_TEXTURE_2D, textures[i].id);
         }
-
+        
         // draw mesh
         glBindVertexArray(VAO);
         glDrawElements(shader.DrawMode, indices.size(), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
-
+        
         // always good practice to set everything back to defaults once configured.
         glActiveTexture(GL_TEXTURE0);
     }
@@ -115,7 +115,7 @@ private:
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
-
+        
         // set the vertex attribute pointers
         // vertex Positions
         glEnableVertexAttribArray(0);

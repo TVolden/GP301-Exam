@@ -41,6 +41,10 @@ uniform mat3 modelInvTra;  // inverse of the transpose of the model matrix, used
 uniform vec3 lightDirection;
 uniform vec3 viewPosition;
 
+// Displacement variables
+uniform sampler2D texture_ambient1;
+uniform float displacementFactor;
+
 vec2 interpolate2D(vec2 v0, vec2 v1, vec2 v2)
 {
     return vec2(gl_TessCoord.x) * v0 + vec2(gl_TessCoord.y) * v1 + vec2(gl_TessCoord.z) * v2;
@@ -61,7 +65,6 @@ void main()
 
     // Normal in world space
     vec3 N = interpolate3D(oPatch.Normal[0], oPatch.Normal[1], oPatch.Normal[2]);
-    N = normalize(N);
 
     //vec3 position = interpolate3D(cs_out[0].WorldPos, cs_out[1].WorldPos, cs_out[2].WorldPos);
 
@@ -96,13 +99,13 @@ void main()
     es_out.InverseTBN = transpose(TBN);
     
     // Displace the vertex along the normal
-//    float Displacement = texture(gDisplacementMap, es_out.TexCoord.xy).x;
-//    position += N * Displacement * gDispFactor;
+    float Displacement = texture(texture_ambient1, es_out.TexCoord.xy).x;
+    position += N * Displacement * displacementFactor;
 
     // light direction, view position, vertex position, and normal in tangent space
     es_out.LightDir_tangent = TBN * lightDirection;
     es_out.CamPos_tangent = TBN * viewPosition;
-    es_out.Pos_tangent  = TBN * position; // NEW, there was a mistake in the original code, we use the vertex position so it gets interpolated during rasterization
+    es_out.Pos_tangent  = TBN * position;
     es_out.Norm_tangent = TBN * N;
 
    // final vertex transform (for opengl rendering)

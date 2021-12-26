@@ -44,6 +44,7 @@ Model* floorModel;
 Shader* skyboxShader;
 unsigned int skyboxVAO; // skybox handle
 unsigned int cubemapTexture; // skybox texture handle
+Texture* displacementMap;
 
 Camera camera(glm::vec3(0.0f, 1.6f, 5.0f));
 
@@ -72,6 +73,10 @@ struct Config {
     float normalMappingMix = 1.0f;
     float reflectionMix = 0.15f;
 
+    // tessellation
+    float tessellationLevel = 50.0f;
+    float displacementFactor = 0.25f;
+    bool wireframe = false;
 } config;
 
 
@@ -81,8 +86,8 @@ int main()
     // glfw: initialize and configure
     // ------------------------------
     glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 #ifdef __APPLE__
@@ -113,15 +118,16 @@ int main()
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
-
+    
     // init shaders and models
 	shader = new Shader("shaders/shader.vert", "shaders/shader.frag");
     playerShader = new Shader("shaders/soften.vert", "shaders/soften.frag", "shaders/soften.tesc", "shaders/soften.tese");
     playerShader->DrawMode = GL_PATCHES;
 	playerModel = new Model("quake/player.obj");
+
 	floorModel = new Model("floor/floor.obj");
     skyboxShader = new Shader("shaders/skybox.vert", "shaders/skybox.frag");
-
+    
     // init skybox
     vector<std::string> faces
             {
@@ -141,6 +147,12 @@ int main()
     glDepthFunc(GL_LESS); // draws fragments that are closer to the screen in NDC
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_CULL_FACE);
+    
+    // Tessellation settings
+    GLint MaxPatchVertices = 0;
+    glGetIntegerv(GL_MAX_PATCH_VERTICES, &MaxPatchVertices);
+    printf("Max supported patch vertices %d\n", MaxPatchVertices);
+    glPatchParameteri(GL_PATCH_VERTICES, 3);
 
     // IMGUI init
     IMGUI_CHECKVERSION();
@@ -303,9 +315,22 @@ void drawGui(){
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
-
+    
     {
         ImGui::Begin("Settings");
+
+        ImGui::Text("Tessellation: ");
+        ImGui::SliderFloat("tessellation level", &config.tessellationLevel, 2.0f, 20.0f);
+        if (ImGui::Checkbox("Wireframe", &config.wireframe))
+        {
+            if (config.wireframe)
+                glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            else
+                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        }
+        ImGui::SliderFloat("displacement factor", &config.displacementFactor, .0f, 1.0f);
+
+        ImGui::Separator();
 
         ImGui::Text("Ambient light: ");
         ImGui::ColorEdit3("ambient light color", (float*)&config.ambientLightColor);
@@ -325,7 +350,6 @@ void drawGui(){
         ImGui::SliderFloat("specular exponent", &config.specularExponent, 0.0f, 150.0f);
         ImGui::Separator();
 
-
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
         ImGui::End();
     }
@@ -333,8 +357,6 @@ void drawGui(){
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
-
-
 
 void drawScene(){
     // camera parameters
@@ -359,7 +381,7 @@ void drawScene(){
 
     // render floor
     shader->use();
-
+    
     // light uniforms
     shader->setVec3("ambientLightColor", config.ambientLightColor * config.ambientLightIntensity);
     shader->setVec3("lightDirection", config.lightDirection);
@@ -403,6 +425,12 @@ void drawScene(){
     playerShader->setFloat("normalMappingMix", config.normalMappingMix);
     playerShader->setFloat("reflectionMix", config.reflectionMix);
     playerShader->setFloat("specularExponent", config.specularExponent);
+
+    // tessellation uniforms
+    playerShader->setFloat("tessellationLevel", config.tessellationLevel); 
+    playerShader->setFloat("displacementFactor", config.displacementFactor);
+    
+
 
     // set projection matrix uniform
     playerShader->setMat4("projection", projection);
