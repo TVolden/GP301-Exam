@@ -3,8 +3,6 @@
 // define the number of CPs in the output patch
 layout (vertices = 1) out;
 
-uniform vec3 viewPosition;
-
 // attributes of the input CPs
 in VS_OUT {
    vec3 WorldPos;
@@ -33,6 +31,8 @@ struct OutputPatch {
 };
 
 out patch OutputPatch oPatch;
+
+uniform vec3 viewPosition;
 
 float GetTessLevel(float Distance0, float Distance1)
 {
@@ -120,8 +120,8 @@ void main()
     CalcPositions();
 
     // Calculate the tessellation levels
-    gl_TessLevelOuter[0] = 10;//GetTessLevel(EyeToVertexDistance1, EyeToVertexDistance2);
-    gl_TessLevelOuter[1] = 10;//GetTessLevel(EyeToVertexDistance2, EyeToVertexDistance0);
-    gl_TessLevelOuter[2] = 10;//GetTessLevel(EyeToVertexDistance0, EyeToVertexDistance1);
+    gl_TessLevelOuter[0] = 10.0;//GetTessLevel(EyeToVertexDistance1, EyeToVertexDistance2);
+    gl_TessLevelOuter[1] = 10.0;//GetTessLevel(EyeToVertexDistance2, EyeToVertexDistance0);
+    gl_TessLevelOuter[2] = 10.0;//GetTessLevel(EyeToVertexDistance0, EyeToVertexDistance1);
     gl_TessLevelInner[0] = gl_TessLevelOuter[2];
 }
