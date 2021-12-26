@@ -55,11 +55,14 @@ void main()
     // Interpolate the attributes of the output vertex using the barycentric coordinates
     es_out.TexCoord = interpolate2D(oPatch.TexCoord[0], oPatch.TexCoord[1], oPatch.TexCoord[2]);
 
-    //vec3 position = interpolate3D(cs_out[0].WorldPos, cs_out[1].WorldPos, cs_out[2].WorldPos);
+    // Interpolate the tangent
+    vec3 tangen = interpolate3D(oPatch.Tangent[0], oPatch.Tangent[1], oPatch.Tangent[2]);
 
     // Normal in world space
     vec3 N = interpolate3D(oPatch.Normal[0], oPatch.Normal[1], oPatch.Normal[2]);
     N = normalize(N);
+
+    //vec3 position = interpolate3D(cs_out[0].WorldPos, cs_out[1].WorldPos, cs_out[2].WorldPos);
 
     float u = gl_TessCoord.x;
     float v = gl_TessCoord.y;
@@ -73,18 +76,15 @@ void main()
     float wPow2 = pow(w, 2);
 
     vec3 position = oPatch.WorldPos_B300 * wPow3 +
-    oPatch.WorldPos_B030 * uPow3 +
-    oPatch.WorldPos_B003 * vPow3 +
-    oPatch.WorldPos_B210 * 3.0 * wPow2 * u +
-    oPatch.WorldPos_B120 * 3.0 * w * uPow2 +
-    oPatch.WorldPos_B201 * 3.0 * wPow2 * v +
-    oPatch.WorldPos_B021 * 3.0 * uPow2 * v +
-    oPatch.WorldPos_B102 * 3.0 * w * vPow2 +
-    oPatch.WorldPos_B012 * 3.0 * u * vPow2 +
-    oPatch.WorldPos_B111 * 6.0 * w * u * v;
-
-    // Interpolate the tangent
-    vec3 tangen = interpolate3D(oPatch.Tangent[0], oPatch.Tangent[1], oPatch.Tangent[2]);
+        oPatch.WorldPos_B030 * uPow3 +
+        oPatch.WorldPos_B003 * vPow3 +
+        oPatch.WorldPos_B210 * 3.0 * wPow2 * u +
+        oPatch.WorldPos_B120 * 3.0 * w * uPow2 +
+        oPatch.WorldPos_B201 * 3.0 * wPow2 * v +
+        oPatch.WorldPos_B021 * 3.0 * uPow2 * v +
+        oPatch.WorldPos_B102 * 3.0 * w * vPow2 +
+        oPatch.WorldPos_B012 * 3.0 * u * vPow2 +
+        oPatch.WorldPos_B111 * 6.0 * w * u * v;
 
     vec3 T = normalize(modelInvTra * tangen);
     T = normalize(T - dot(T, N) * N);
