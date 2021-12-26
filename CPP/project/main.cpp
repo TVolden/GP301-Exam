@@ -157,7 +157,7 @@ int main()
 
     // Setup Platform/Renderer bindings
     ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init("#version 330 core");
+    ImGui_ImplOpenGL3_Init("#version 410 core");
 
     // render loop
     while (!glfwWindowShouldClose(window))

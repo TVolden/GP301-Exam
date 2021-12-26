@@ -2,13 +2,24 @@
 
 layout(triangles, equal_spacing, ccw) in;
 
-in CS_OUT {
-   vec3 WorldPos;
-   vec3 Normal;
-   vec2 TexCoord;
-   vec3 Tangent;
-   vec3 Bitangent;
-} cs_out[];
+struct OutputPatch {
+    vec3 WorldPos_B030;
+    vec3 WorldPos_B021;
+    vec3 WorldPos_B012;
+    vec3 WorldPos_B003;
+    vec3 WorldPos_B102;
+    vec3 WorldPos_B201;
+    vec3 WorldPos_B300;
+    vec3 WorldPos_B210;
+    vec3 WorldPos_B120;
+    vec3 WorldPos_B111;
+    vec3 Normal[3];
+    vec2 TexCoord[3];
+    vec3 Tangent[3];
+    vec3 Bitangent[3];
+};
+
+in patch OutputPatch oPatch;
 
 out ES_OUT {
    vec3 CamPos_tangent;
@@ -42,14 +53,38 @@ vec3 interpolate3D(vec3 v0, vec3 v1, vec3 v2)
 void main()
 {
     // Interpolate the attributes of the output vertex using the barycentric coordinates
-    es_out.TexCoord = interpolate2D(cs_out[0].TexCoord, cs_out[1].TexCoord, cs_out[2].TexCoord);
+    es_out.TexCoord = interpolate2D(oPatch.TexCoord[0], oPatch.TexCoord[1], oPatch.TexCoord[2]);
+
+    //vec3 position = interpolate3D(cs_out[0].WorldPos, cs_out[1].WorldPos, cs_out[2].WorldPos);
 
     // Normal in world space
-    vec3 N = interpolate3D(cs_out[0].Normal, cs_out[1].Normal, cs_out[2].Normal);
+    vec3 N = interpolate3D(oPatch.Normal[0], oPatch.Normal[1], oPatch.Normal[2]);
     N = normalize(N);
 
+    float u = gl_TessCoord.x;
+    float v = gl_TessCoord.y;
+    float w = gl_TessCoord.z;
+
+    float uPow3 = pow(u, 3);
+    float vPow3 = pow(v, 3);
+    float wPow3 = pow(w, 3);
+    float uPow2 = pow(u, 2);
+    float vPow2 = pow(v, 2);
+    float wPow2 = pow(w, 2);
+
+    vec3 position = oPatch.WorldPos_B300 * wPow3 +
+    oPatch.WorldPos_B030 * uPow3 +
+    oPatch.WorldPos_B003 * vPow3 +
+    oPatch.WorldPos_B210 * 3.0 * wPow2 * u +
+    oPatch.WorldPos_B120 * 3.0 * w * uPow2 +
+    oPatch.WorldPos_B201 * 3.0 * wPow2 * v +
+    oPatch.WorldPos_B021 * 3.0 * uPow2 * v +
+    oPatch.WorldPos_B102 * 3.0 * w * vPow2 +
+    oPatch.WorldPos_B012 * 3.0 * u * vPow2 +
+    oPatch.WorldPos_B111 * 6.0 * w * u * v;
+
     // Interpolate the tangent
-    vec3 tangen = interpolate3D(cs_out[0].Tangent, cs_out[1].Tangent, cs_out[2].Tangent);
+    vec3 tangen = interpolate3D(oPatch.Tangent[0], oPatch.Tangent[1], oPatch.Tangent[2]);
 
     vec3 T = normalize(modelInvTra * tangen);
     T = normalize(T - dot(T, N) * N);
@@ -58,8 +93,6 @@ void main()
     
     // inverse of TBN, to map from tangent space to world space (needed for reflections)
     es_out.InverseTBN = transpose(TBN);
-
-    vec3 position = interpolate3D(cs_out[0].WorldPos, cs_out[1].WorldPos, cs_out[2].WorldPos);
     
     // Displace the vertex along the normal
 //    float Displacement = texture(gDisplacementMap, es_out.TexCoord.xy).x;
