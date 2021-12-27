@@ -71,7 +71,7 @@ void main()
     vec3 tangen = interpolate3D(oPatch.Tangent[0], oPatch.Tangent[1], oPatch.Tangent[2]);
 
     // Normal in world space
-    //vec3 N = interpolate3D(oPatch.Normal[0], oPatch.Normal[1], oPatch.Normal[2]);
+    vec3 N = interpolate3D(oPatch.Normal[0], oPatch.Normal[1], oPatch.Normal[2]);
 
     //vec3 position = interpolate3D(cs_out[0].WorldPos, cs_out[1].WorldPos, cs_out[2].WorldPos);
 
@@ -97,7 +97,7 @@ void main()
         oPatch.WorldPos_B102 * 3.0 * w * vPow2 +
         oPatch.WorldPos_B012 * 3.0 * u * vPow2 +
         oPatch.WorldPos_B111 * 6.0 * w * u * v;
-    
+   /* 
     vec3 N = 
         oPatch.Normal_200 * wPow2 +
         oPatch.Normal_020 * uPow2 +
@@ -105,6 +105,7 @@ void main()
         oPatch.Normal_110 * w * u +
         oPatch.Normal_011 * u * v +
         oPatch.Normal_101 * w * v;
+        */
 
     vec3 T = normalize(modelInvTra * tangen);
     T = normalize(T - dot(T, N) * N);
