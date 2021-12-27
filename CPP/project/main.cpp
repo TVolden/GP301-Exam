@@ -324,7 +324,7 @@ void drawGui(){
         ImGui::Begin("Settings");
 
         ImGui::Text("Tessellation: ");
-        ImGui::SliderFloat("tessellation level", &config.tessellationLevel, 2.0f, 20.0f);
+        ImGui::SliderFloat("tessellation level", &config.tessellationLevel, 1.0f, 20.0f);
         if (ImGui::Checkbox("Wireframe", &config.wireframe))
         {
             if (config.wireframe)
