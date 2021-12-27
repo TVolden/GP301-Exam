@@ -77,7 +77,7 @@ struct Config {
 
     // tessellation
     float tessellationLevel = 10.0f;
-    float displacementFactor = 0.25f;
+    float displacementFactor = 0.05f;
     bool wireframe = false;
 } config;
 

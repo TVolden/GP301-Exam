@@ -66,8 +66,6 @@ void main()
     // Normal in world space
     vec3 N = interpolate3D(oPatch.Normal[0], oPatch.Normal[1], oPatch.Normal[2]);
 
-    //vec3 position = interpolate3D(cs_out[0].WorldPos, cs_out[1].WorldPos, cs_out[2].WorldPos);
-
     float u = gl_TessCoord.x;
     float v = gl_TessCoord.y;
     float w = gl_TessCoord.z;
@@ -101,6 +99,7 @@ void main()
     
     // Displace the vertex along the normal
     float Displacement = texture(texture_ambient1, es_out.TexCoord.xy).x;
+    Displacement = Displacement * 2.0 - 1.0;
     position += N * Displacement * displacementFactor;
 
     // light direction, view position, vertex position, and normal in tangent space
