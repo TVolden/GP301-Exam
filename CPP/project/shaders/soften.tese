@@ -14,13 +14,6 @@ struct OutputPatch {
     vec3 WorldPos_B120;
     vec3 WorldPos_B111;
 
-    vec3 Normal_200;
-    vec3 Normal_020;
-    vec3 Normal_002;
-    vec3 Normal_011;
-    vec3 Normal_101;
-    vec3 Normal_110;
-
     vec3 Normal[3];
     vec2 TexCoord[3];
     vec3 Tangent[3];
@@ -97,15 +90,6 @@ void main()
         oPatch.WorldPos_B102 * 3.0 * w * vPow2 +
         oPatch.WorldPos_B012 * 3.0 * u * vPow2 +
         oPatch.WorldPos_B111 * 6.0 * w * u * v;
-   /* 
-    vec3 N = 
-        oPatch.Normal_200 * wPow2 +
-        oPatch.Normal_020 * uPow2 +
-        oPatch.Normal_002 * vPow2 +
-        oPatch.Normal_110 * w * u +
-        oPatch.Normal_011 * u * v +
-        oPatch.Normal_101 * w * v;
-        */
 
     vec3 T = normalize(modelInvTra * tangen);
     T = normalize(T - dot(T, N) * N);

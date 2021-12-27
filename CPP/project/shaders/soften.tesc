@@ -24,13 +24,6 @@ struct OutputPatch {
     vec3 WorldPos_B120;
     vec3 WorldPos_B111;
 
-    vec3 Normal_200;
-    vec3 Normal_020;
-    vec3 Normal_002;
-    vec3 Normal_011;
-    vec3 Normal_101;
-    vec3 Normal_110;
-
     vec3 Normal[3];
     vec2 TexCoord[3];
     vec3 Tangent[3];
@@ -89,34 +82,6 @@ void CalcPositions()
     oPatch.WorldPos_B111 += (oPatch.WorldPos_B111 - Center) / 2.0;
 }
 
-float v(vec3 Pi, vec3 Pj, vec3 Ni, vec3 Nj) 
-{
-    return 2.0 * dot(Pj - Pi, Ni - Nj) / dot(Pj - Pi, Pj - Pi);
-}
-
-void CalcNormals() 
-{
-    vec3 P1 = cs_in[2].WorldPos;
-    vec3 P2 = cs_in[0].WorldPos;
-    vec3 P3 = cs_in[1].WorldPos;
-
-    vec3 N1 = cs_in[2].Normal;
-    vec3 N2 = cs_in[0].Normal;
-    vec3 N3 = cs_in[1].Normal;
-
-    oPatch.Normal_200 = N1;
-    oPatch.Normal_020 = N2;
-    oPatch.Normal_002 = N3;
-
-    vec3 h110 = N1 + N2 - v(P1, P2, N1, N2) * (P2 - P1);
-    vec3 h011 = N2 + N3 - v(P2, P3, N2, N3) * (P3 - P2);
-    vec3 h101 = N3 + N1 - v(P3, P1, N3, N1) * (P1 - P3);
-
-    oPatch.Normal_110 = normalize(h110);
-    oPatch.Normal_011 = normalize(h011);
-    oPatch.Normal_101 = normalize(h101);
-}
-
 void main()
 {
     // Set the control points of the output patch
@@ -129,7 +94,6 @@ void main()
     }
 
     CalcPositions();
-    CalcNormals();
 
     // Calculate the tessellation levels
     gl_TessLevelOuter[0] = tessellationLevel;
