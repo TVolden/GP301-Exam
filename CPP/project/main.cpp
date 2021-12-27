@@ -39,6 +39,8 @@ const unsigned int SCR_HEIGHT = 720;
 Shader* shader;
 Shader* playerShader;
 Model* playerModel;
+Model* monkeyModel;
+Model* cubeModel;
 Model* floorModel;
 
 Shader* skyboxShader;
@@ -74,12 +76,10 @@ struct Config {
     float reflectionMix = 0.15f;
 
     // tessellation
-    float tessellationLevel = 50.0f;
+    float tessellationLevel = 10.0f;
     float displacementFactor = 0.25f;
     bool wireframe = false;
 } config;
-
-
 
 int main()
 {
@@ -124,6 +124,8 @@ int main()
     playerShader = new Shader("shaders/soften.vert", "shaders/soften.frag", "shaders/soften.tesc", "shaders/soften.tese");
     playerShader->DrawMode = GL_PATCHES;
 	playerModel = new Model("quake/player.obj");
+    monkeyModel = new Model("blender/monkey.obj");
+    cubeModel = new Model("blender/cube.obj");
 
 	floorModel = new Model("floor/floor.obj");
     skyboxShader = new Shader("shaders/skybox.vert", "shaders/skybox.frag");
@@ -193,9 +195,11 @@ int main()
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
 
-	//delete carModel;
+	//delete models;
 	delete floorModel;
 	delete playerModel;
+    delete monkeyModel;
+    delete cubeModel;
     delete shader;
     delete skyboxShader;
 
@@ -452,6 +456,24 @@ void drawScene(){
     playerShader->setMat4("model", model);
     playerShader->setMat3("modelInvTra", glm::inverse(glm::transpose(model)));
     playerModel->Draw(*playerShader);
+
+    glm::mat4 monkeyTransform = glm::mat4(1.0f);
+    monkeyTransform = glm::translate(monkeyTransform, glm::vec3(1, 0.5, 0));
+    monkeyTransform = glm::scale(monkeyTransform, glm::vec3(0.25, 0.25, 0.25));
+    
+    model = monkeyTransform;
+    playerShader->setMat4("model", model);
+    playerShader->setMat3("modelInvTra", glm::inverse(glm::transpose(model)));
+    monkeyModel->Draw(*playerShader);
+
+    glm::mat4 cubeTransform = glm::mat4(1.0f);
+    cubeTransform = glm::translate(cubeTransform, glm::vec3(-1, 0.5, 0));
+    cubeTransform = glm::scale(cubeTransform, glm::vec3(0.25, 0.25, 0.25));
+
+    model = cubeTransform;
+    playerShader->setMat4("model", model);
+    playerShader->setMat3("modelInvTra", glm::inverse(glm::transpose(model)));
+    cubeModel->Draw(*playerShader);
     // draw transparent objects at the end
     //glEnable(GL_BLEND); glDisable(GL_CULL_FACE);
     //glDisable(GL_BLEND); glEnable(GL_CULL_FACE);

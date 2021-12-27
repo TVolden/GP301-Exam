@@ -14,6 +14,13 @@ struct OutputPatch {
     vec3 WorldPos_B120;
     vec3 WorldPos_B111;
 
+    vec3 Normal_200;
+    vec3 Normal_020;
+    vec3 Normal_002;
+    vec3 Normal_011;
+    vec3 Normal_101;
+    vec3 Normal_110;
+
     vec3 Normal[3];
     vec2 TexCoord[3];
     vec3 Tangent[3];
@@ -64,7 +71,7 @@ void main()
     vec3 tangen = interpolate3D(oPatch.Tangent[0], oPatch.Tangent[1], oPatch.Tangent[2]);
 
     // Normal in world space
-    vec3 N = interpolate3D(oPatch.Normal[0], oPatch.Normal[1], oPatch.Normal[2]);
+    //vec3 N = interpolate3D(oPatch.Normal[0], oPatch.Normal[1], oPatch.Normal[2]);
 
     //vec3 position = interpolate3D(cs_out[0].WorldPos, cs_out[1].WorldPos, cs_out[2].WorldPos);
 
@@ -79,7 +86,8 @@ void main()
     float vPow2 = pow(v, 2);
     float wPow2 = pow(w, 2);
 
-    vec3 position = oPatch.WorldPos_B300 * wPow3 +
+    vec3 position = 
+        oPatch.WorldPos_B300 * wPow3 +
         oPatch.WorldPos_B030 * uPow3 +
         oPatch.WorldPos_B003 * vPow3 +
         oPatch.WorldPos_B210 * 3.0 * wPow2 * u +
@@ -89,6 +97,14 @@ void main()
         oPatch.WorldPos_B102 * 3.0 * w * vPow2 +
         oPatch.WorldPos_B012 * 3.0 * u * vPow2 +
         oPatch.WorldPos_B111 * 6.0 * w * u * v;
+    
+    vec3 N = 
+        oPatch.Normal_200 * wPow2 +
+        oPatch.Normal_020 * uPow2 +
+        oPatch.Normal_002 * vPow2 +
+        oPatch.Normal_110 * w * u +
+        oPatch.Normal_011 * u * v +
+        oPatch.Normal_101 * w * v;
 
     vec3 T = normalize(modelInvTra * tangen);
     T = normalize(T - dot(T, N) * N);

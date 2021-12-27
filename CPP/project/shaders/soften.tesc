@@ -24,6 +24,13 @@ struct OutputPatch {
     vec3 WorldPos_B120;
     vec3 WorldPos_B111;
 
+    vec3 Normal_200;
+    vec3 Normal_020;
+    vec3 Normal_002;
+    vec3 Normal_011;
+    vec3 Normal_101;
+    vec3 Normal_110;
+
     vec3 Normal[3];
     vec2 TexCoord[3];
     vec3 Tangent[3];
@@ -42,39 +49,72 @@ vec3 ProjectToPlane(vec3 Point, vec3 PlanePoint, vec3 PlaneNormal)
     return (Point - d);
 }
 
+float w(vec3 Pi, vec3 Pj, vec3 Ni) 
+{
+    return dot(Pj - Pi, Ni);
+}
+
 void CalcPositions()
 {
-    // The original vertices stay the same
-    oPatch.WorldPos_B030 = cs_in[0].WorldPos;
-    oPatch.WorldPos_B003 = cs_in[1].WorldPos;
-    oPatch.WorldPos_B300 = cs_in[2].WorldPos;
+    // Order the points so the texture works
+    vec3 P1 = cs_in[2].WorldPos;
+    vec3 P2 = cs_in[0].WorldPos;
+    vec3 P3 = cs_in[1].WorldPos;
 
-    // Edges are names according to the opposing vertex
-    vec3 EdgeB300 = oPatch.WorldPos_B003 - oPatch.WorldPos_B030;
-    vec3 EdgeB030 = oPatch.WorldPos_B300 - oPatch.WorldPos_B003;
-    vec3 EdgeB003 = oPatch.WorldPos_B030 - oPatch.WorldPos_B300;
+    vec3 N1 = cs_in[2].Normal;
+    vec3 N2 = cs_in[0].Normal;
+    vec3 N3 = cs_in[1].Normal;
 
-    // Generate two midpoints on each edge
-    oPatch.WorldPos_B021 = oPatch.WorldPos_B030 + EdgeB300 / 3.0;
-    oPatch.WorldPos_B012 = oPatch.WorldPos_B030 + EdgeB300 * 2.0 / 3.0;
-    oPatch.WorldPos_B102 = oPatch.WorldPos_B003 + EdgeB030 / 3.0;
-    oPatch.WorldPos_B201 = oPatch.WorldPos_B003 + EdgeB030 * 2.0 / 3.0;
-    oPatch.WorldPos_B210 = oPatch.WorldPos_B300 + EdgeB003 / 3.0;
-    oPatch.WorldPos_B120 = oPatch.WorldPos_B300 + EdgeB003 * 2.0 / 3.0;
+    // vertex coefficient
+    oPatch.WorldPos_B300 = P1;
+    oPatch.WorldPos_B030 = P2;
+    oPatch.WorldPos_B003 = P3;
+    
+    
+    //vec3 T = cross(N1, N2);
+    //oPatch.WorldPos_B210 = P1 + dot(P2 - P1, T) / 3 * T;
+    
+    // tangent coefficient
+    oPatch.WorldPos_B210 = (2.0 * P1 + P2 - w(P1, P1, N1) * N1) / 3.0;
+    oPatch.WorldPos_B120 = (2.0 * P2 + P1 - w(P2, P1, N2) * N2) / 3.0;
+    oPatch.WorldPos_B021 = (2.0 * P2 + P3 - w(P2, P3, N2) * N2) / 3.0;
+    oPatch.WorldPos_B012 = (2.0 * P3 + P2 - w(P3, P2, N3) * N3) / 3.0;
+    oPatch.WorldPos_B102 = (2.0 * P3 + P1 - w(P3, P1, N3) * N3) / 3.0;
+    oPatch.WorldPos_B201 = (2.0 * P1 + P3 - w(P1, P3, N1) * N1) / 3.0;
 
-    // Project each midpoint on the plane defined by the nearest vertex and its normal
-    oPatch.WorldPos_B021 = ProjectToPlane(oPatch.WorldPos_B021, oPatch.WorldPos_B030, oPatch.Normal[0]);
-    oPatch.WorldPos_B012 = ProjectToPlane(oPatch.WorldPos_B012, oPatch.WorldPos_B003, oPatch.Normal[1]);
-    oPatch.WorldPos_B102 = ProjectToPlane(oPatch.WorldPos_B102, oPatch.WorldPos_B003, oPatch.Normal[1]);
-    oPatch.WorldPos_B201 = ProjectToPlane(oPatch.WorldPos_B201, oPatch.WorldPos_B300, oPatch.Normal[2]);
-    oPatch.WorldPos_B210 = ProjectToPlane(oPatch.WorldPos_B210, oPatch.WorldPos_B300, oPatch.Normal[2]);
-    oPatch.WorldPos_B120 = ProjectToPlane(oPatch.WorldPos_B120, oPatch.WorldPos_B030, oPatch.Normal[0]);
+    // center coefficient
+    vec3 E = (oPatch.WorldPos_B210 + oPatch.WorldPos_B120 + oPatch.WorldPos_B021+
+    oPatch.WorldPos_B012 + oPatch.WorldPos_B102 + oPatch.WorldPos_B201) / 6.0;
+    vec3 V = (P1 + P2 + P3) / 3.0;
+    oPatch.WorldPos_B111 = E + (E - V) / 2.0;
+}
 
-    // Handle the center
-    vec3 Center = (oPatch.WorldPos_B003 + oPatch.WorldPos_B030 + oPatch.WorldPos_B300) / 3.0;
-    oPatch.WorldPos_B111 = (oPatch.WorldPos_B021 + oPatch.WorldPos_B012 + oPatch.WorldPos_B102 +
-                            oPatch.WorldPos_B201 + oPatch.WorldPos_B210 + oPatch.WorldPos_B120) / 6.0;
-    oPatch.WorldPos_B111 += (oPatch.WorldPos_B111 - Center) / 2.0;
+float v(vec3 Pi, vec3 Pj, vec3 Ni, vec3 Nj) 
+{
+    return 2.0 * dot(Pj - Pi, Ni - Nj) / dot(Pj - Pi, Pj - Pi);
+}
+
+void CalcNormals() 
+{
+    vec3 P1 = cs_in[0].WorldPos;
+    vec3 P2 = cs_in[1].WorldPos;
+    vec3 P3 = cs_in[2].WorldPos;
+
+    vec3 N1 = cs_in[0].Normal;
+    vec3 N2 = cs_in[1].Normal;
+    vec3 N3 = cs_in[2].Normal;
+
+    oPatch.Normal_200 = N1;
+    oPatch.Normal_020 = N2;
+    oPatch.Normal_002 = N3;
+
+    vec3 h110 = N1 + N2 - v(P1, P2, N1, N2) * (P2 - P1);
+    vec3 h011 = N2 + N3 - v(P2, P3, N2, N3) * (P3 - P2);
+    vec3 h101 = N3 + N1 - v(P3, P1, N3, N1) * (P1 - P3);
+
+    oPatch.Normal_110 = normalize(h110);
+    oPatch.Normal_011 = normalize(h011);
+    oPatch.Normal_101 = normalize(h101);
 }
 
 void main()
@@ -89,6 +129,7 @@ void main()
     }
 
     CalcPositions();
+    CalcNormals();
 
     // Calculate the tessellation levels
     gl_TessLevelOuter[0] = tessellationLevel;
