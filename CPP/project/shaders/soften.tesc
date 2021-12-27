@@ -70,12 +70,11 @@ void CalcPositions()
     oPatch.WorldPos_B030 = P2;
     oPatch.WorldPos_B003 = P3;
     
-    
-    //vec3 T = cross(N1, N2);
-    //oPatch.WorldPos_B210 = P1 + dot(P2 - P1, T) / 3 * T;
+    vec3 T = cross(N1, N2);
+    oPatch.WorldPos_B210 = P1 + dot(P2 - P1, T) / 3 * T;
     
     // tangent coefficient
-    oPatch.WorldPos_B210 = (2.0 * P1 + P2 - w(P1, P1, N1) * N1) / 3.0;
+    //oPatch.WorldPos_B210 = (2.0 * P1 + P2 - w(P1, P1, N1) * N1) / 3.0;
     oPatch.WorldPos_B120 = (2.0 * P2 + P1 - w(P2, P1, N2) * N2) / 3.0;
     oPatch.WorldPos_B021 = (2.0 * P2 + P3 - w(P2, P3, N2) * N2) / 3.0;
     oPatch.WorldPos_B012 = (2.0 * P3 + P2 - w(P3, P2, N3) * N3) / 3.0;
