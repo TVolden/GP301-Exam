@@ -31,6 +31,8 @@ out ES_OUT {
    mat3 InverseTBN;
 } es_out;
 
+uniform bool usePNTriangles;
+
 // transformations
 uniform mat4 projection;   // camera projection matrix
 uniform mat4 view;         // represents the world in the eye coord space
@@ -65,29 +67,38 @@ void main()
 
     // Normal in world space
     vec3 N = interpolate3D(oPatch.Normal[0], oPatch.Normal[1], oPatch.Normal[2]);
+    
+    vec3 position;
 
-    float u = gl_TessCoord.x;
-    float v = gl_TessCoord.y;
-    float w = gl_TessCoord.z;
+    if (usePNTriangles)
+    {
+        float u = gl_TessCoord.x;
+        float v = gl_TessCoord.y;
+        float w = gl_TessCoord.z;
 
-    float uPow3 = pow(u, 3);
-    float vPow3 = pow(v, 3);
-    float wPow3 = pow(w, 3);
-    float uPow2 = pow(u, 2);
-    float vPow2 = pow(v, 2);
-    float wPow2 = pow(w, 2);
+        float uPow3 = pow(u, 3);
+        float vPow3 = pow(v, 3);
+        float wPow3 = pow(w, 3);
+        float uPow2 = pow(u, 2);
+        float vPow2 = pow(v, 2);
+        float wPow2 = pow(w, 2);
 
-    vec3 position = 
-        oPatch.WorldPos_B300 * wPow3 +
-        oPatch.WorldPos_B030 * uPow3 +
-        oPatch.WorldPos_B003 * vPow3 +
-        oPatch.WorldPos_B210 * 3.0 * wPow2 * u +
-        oPatch.WorldPos_B120 * 3.0 * w * uPow2 +
-        oPatch.WorldPos_B201 * 3.0 * wPow2 * v +
-        oPatch.WorldPos_B021 * 3.0 * uPow2 * v +
-        oPatch.WorldPos_B102 * 3.0 * w * vPow2 +
-        oPatch.WorldPos_B012 * 3.0 * u * vPow2 +
-        oPatch.WorldPos_B111 * 6.0 * w * u * v;
+        position = 
+            oPatch.WorldPos_B300 * wPow3 +
+            oPatch.WorldPos_B030 * uPow3 +
+            oPatch.WorldPos_B003 * vPow3 +
+            oPatch.WorldPos_B210 * 3.0 * wPow2 * u +
+            oPatch.WorldPos_B120 * 3.0 * w * uPow2 +
+            oPatch.WorldPos_B201 * 3.0 * wPow2 * v +
+            oPatch.WorldPos_B021 * 3.0 * uPow2 * v +
+            oPatch.WorldPos_B102 * 3.0 * w * vPow2 +
+            oPatch.WorldPos_B012 * 3.0 * u * vPow2 +
+            oPatch.WorldPos_B111 * 6.0 * w * u * v;
+    }
+    else
+    {
+        position = interpolate3D(oPatch.WorldPos_B030, oPatch.WorldPos_B003, oPatch.WorldPos_B300);
+    }
 
     vec3 T = normalize(modelInvTra * tangen);
     T = normalize(T - dot(T, N) * N);

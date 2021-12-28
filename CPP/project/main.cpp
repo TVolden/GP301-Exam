@@ -79,6 +79,7 @@ struct Config {
     float tessellationLevel = 10.0f;
     float displacementFactor = 0.05f;
     bool wireframe = false;
+    bool usePNTriangles = true;
 } config;
 
 int main()
@@ -333,6 +334,7 @@ void drawGui(){
                 glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
         ImGui::SliderFloat("displacement factor", &config.displacementFactor, .0f, 1.0f);
+        ImGui::Checkbox("use PN Triangles", &config.usePNTriangles);
 
         ImGui::Separator();
 
@@ -433,8 +435,7 @@ void drawScene(){
     // tessellation uniforms
     playerShader->setFloat("tessellationLevel", config.tessellationLevel); 
     playerShader->setFloat("displacementFactor", config.displacementFactor);
-    
-
+    playerShader->setBool("usePNTriangles", config.usePNTriangles);
 
     // set projection matrix uniform
     playerShader->setMat4("projection", projection);
