@@ -23,7 +23,7 @@ public:
         std::string vertexCode;
         std::string fragmentCode;
         std::string tesControlCode;
-        std::string testEvalCode;
+        std::string tesEvalCode;
         std::ifstream vShaderFile;
         std::ifstream fShaderFile;
         std::ifstream gShaderFile;
@@ -61,7 +61,7 @@ public:
                 std::stringstream gShaderStream;
                 gShaderStream << gShaderFile.rdbuf();
                 gShaderFile.close();
-                testEvalCode = gShaderStream.str();
+                tesEvalCode = gShaderStream.str();
             }
             
         }
@@ -99,7 +99,7 @@ public:
         unsigned int tesEval;
         if (tesEvalPath != nullptr)
         {
-            const char * gShaderCode = testEvalCode.c_str();
+            const char * gShaderCode = tesEvalCode.c_str();
             tesEval = glCreateShader(GL_TESS_EVALUATION_SHADER);
             glShaderSource(tesEval, 1, &gShaderCode, NULL);
             glCompileShader(tesEval);

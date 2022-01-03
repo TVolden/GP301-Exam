@@ -10,4 +10,4 @@ d 1
 illum 2
 map_Kd blue.png
 map_Bump blue.png
-map_Ka grey.png
+disp grey.png

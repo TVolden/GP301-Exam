@@ -428,7 +428,7 @@ void drawScene(){
 
     // material uniforms
     playerShader->setFloat("ambientOcclusionMix", config.ambientOcclusionMix);
-    playerShader->setFloat("normalMappingMix", config.normalMappingMix);
+    playerShader->setFloat("normalMappingMix", config.normalMappingMix);    
     playerShader->setFloat("reflectionMix", config.reflectionMix);
     playerShader->setFloat("specularExponent", config.specularExponent);
 

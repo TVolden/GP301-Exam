@@ -44,7 +44,7 @@ uniform vec3 lightDirection;
 uniform vec3 viewPosition;
 
 // Displacement variables
-uniform sampler2D texture_ambient1;
+uniform sampler2D texture_displacement;
 uniform float displacementFactor;
 
 vec2 interpolate2D(vec2 v0, vec2 v1, vec2 v2)
@@ -109,7 +109,7 @@ void main()
     es_out.InverseTBN = transpose(TBN);
     
     // Displace the vertex along the normal
-    float Displacement = texture(texture_ambient1, es_out.TexCoord.xy).x;
+    float Displacement = texture(texture_displacement, es_out.TexCoord.xy).x;
     Displacement = Displacement * 2.0 - 1.0;
     position += N * Displacement * displacementFactor;
 
