@@ -13,7 +13,7 @@ Concepts for the techniques will be introduced in the following sections and ela
 
 ### Tessellation
 
-![](images\image14.png)  
+![](/images/image14.png)  
 Figure 1: The render pipeline with focus on tessellation.
 
 In OpenGL the procedure of tessellation is split into 3 stages, which are introduced in the render pipeline between the vertex shader and the fragment shader, see figure 1.
@@ -23,7 +23,7 @@ The output from the vertex shader is gathered in patches and parsed to the tesse
 
 Vlachos, Peters, Boyd and Mitchell introduced curved point normal triangles “as an inexpensive means of improving visual quality by smoothing out silhouette edges and providing more sample points for vertex shading operations.“ \[3, p. 159\]. They define point normal (PN) triangles as one cubic Bézier patch arranged to form a control net, see figure 2\.
 
-![](images\image13.png)  
+![](/images/image13.png)  
 Figure 2: Triangular Bézier patch consisting of ten coefficients: three vertex (red), six tangent (blue) and one center (green).
 
 To calculate the final position of a vertex, a set of coefficients are scaled and summarized, shown in formula 1:
@@ -37,7 +37,7 @@ The tangent coefficients can be calculated by interpolating between vertex coeff
 
 Notice that the variables i, j and k will have the values 0, 1 and 2 assigned in various ways, thereby eliminating one vertex coefficient entirely and interpolating between the remaining two.
 
-![](images\image15.png)  
+![](/images/image15.png)  
 Figure 3: Tangent coefficients (blue) are projected onto the plane of the nearest vertex (red) normal (green).
 
 Figure 3 shows how to curve the triangle by projecting a vector from the closest vertex to the tangent coefficient onto the plane of the vertex normal, this is also expressed in formula 3:
@@ -49,7 +49,7 @@ The center coefficient is set as halfway between the interpolated vertex coeffic
 
 ### Displacement mapping
 
-![](images\image17.png)  
+![](/images/image17.png)  
 Figure 4: Handmade height map for the quake player model.
 
 Displacement mapping is a texture based procedural geometric positioning process, which is useful combined with tessellation to imprint details on a surface. Displacement mapping, in contrast to other approaches such as normal, bump and parallax mapping, can adjust silhouette edges and benefit from self shadowing \[4\]. The technique samples a monochrome heightmap to determine the final placement of a vertex along the surface normal, figure 4 shows the heightmap used for this project.
@@ -96,7 +96,7 @@ After determining the global position and surface normal in the TES, displacemen
 
 ## Result
 
-![](images\image18.png)  
+![](/images/image18.png)  
 Figure 5: The original Quake player character (left), with applied PN triangle (middle) and displacement (right).
 
 The character was imported and rendered using the tessellation shader program. The program has PN triangles and displacement mapping enabled by default, but they can be disabled or modified in the user interface, which can be accessed by pressing the spacebar. The result of applying both PN triangles and displacement mapping can be seen up close in figure 5\. The model looks smoother and facial features like the nose are clearly improved. Sharp objects like the axe become rounded, which may be undesirable. The model texture is still stretched. *Overall the model was improved and looks more interesting.*  
