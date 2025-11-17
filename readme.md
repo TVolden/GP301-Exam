@@ -42,7 +42,7 @@ Figure 3: Tangent coefficients (blue) are projected onto the plane of the neares
 
 Figure 3 shows how to curve the triangle by projecting a vector from the closest vertex to the tangent coefficient onto the plane of the vertex normal, this is also expressed in formula 3:
 
-3) $$ B'_{ijk} = B_{ijk} - (B_{ijk} - B_u) \cdot N_u * N_u, u = \begin{cases} 300 & \text{if $i = 2$} \\ 030 & \text{if $j = 2$} \\ 003 & \text{if $k = 2$} \\ \end{cases} $$
+3) $$B'_{ijk} = B_{ijk} - (B_{ijk} - B_u) \cdot N_u * N_u, u = \begin{cases} 300 & \text{if $i = 2$} \\ 030 & \text{if $j = 2$} \\ 003 & \text{if $k = 2$} \\ \end{cases}$$
 
 This formula ensures that a tangent coefficient is projected onto the plane regardless of whether it was initially located above or below the plane. Because the dot product of the vector and the normalized vertex normal will be negative if the angle between them is greater than 90 degrees.  
 The center coefficient is set as halfway between the interpolated vertex coefficients and the interpolated tangent coefficients. Once all coefficients are calculated, they can be applied to vertex positions provided the barycentric parameters u, v and w.
@@ -82,11 +82,11 @@ The TES’s responsibility is to set the final position of each new vertex. This
 
 In order to smooth out the model a bézier patch had to be constructed and applied, as explained under the introduction. The ten coefficients were calculated in the TCS. The vertex coefficients were set to the original three input vertices after which the tangent coefficients were calculated using formula 2 and 3\. As an example of how to calculate a tangent coefficient, the calculation for B120 is shown in equation 4:
 
-4) $$ B'_{120}=B_{120}-(B_{120}-B_{030}) \cdot N_{030} * N_{030} , B_{120} = \frac{B_{300}}{3}+2 \frac{B_{030}}{3} $$
+4) $$B'_{120}=B_{120}-(B_{120}-B_{030}) \cdot N_{030} * N_{030} , B_{120} = \frac{B_{300}}{3}+2 \frac{B_{030}}{3}$$
 
 The center coefficient was found by summarizing all tangent coefficients and dividing them by six and summarizing all vertex coefficients and dividing them by three. Then the second result was subtracted from the first result and divided by two. To pass the coefficients to the TES a *struct* was created with the ten coefficients along with additional values for the fragment shader. The output layout was limited to one vertex, and to indicate shared values for the whole patch, a special keyword *patch* was added to the *out* variable in the TCS and the *in* variable in the TES. The TES calculated the global position by applying the barycentric parameters as shown in equation 5:
 
-5)  $$ b(u,v,w) = \begin{array}{l} B_{300} w^3 + B_{030} u^3 + B_{003} v^3 + \\ B_{210} 3w^2u + B_{120} 3wu^2 + B_{201} 3w^2v + \\ B_{021} 3u^2v + B_{102}3wv^2 + B_{012} 3uv^2 + B_{111} 6wuv \end{array} $$
+5)  $$b(u,v,w) = \begin{array}{l} B_{300} w^3 + B_{030} u^3 + B_{003} v^3 + \\ B_{210} 3w^2u + B_{120} 3wu^2 + B_{201} 3w^2v + \\ B_{021} 3u^2v + B_{102}3wv^2 + B_{012} 3uv^2 + B_{111} 6wuv \end{array}$$
 
 Other operations were moved from the vertex shader to the TES. The normal and tangent was interpolated between the 3 original vertex values and used to construct a tangent space matrix. Originally the vertex shader had set the *gl\_Position*, but this was also moved to the TES, to keep it simple. This meant that the vertex shader was reduced to pass on information and transform a vertex positions to global space.
 
